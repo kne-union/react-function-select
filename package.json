@@ -1,0 +1,74 @@
+{
+  "name": "@kne/react-function-select",
+  "version": "0.1.0",
+  "description": "行业选择器",
+  "main": "dist/index.js",
+  "module": "dist/index.modern.js",
+  "source": "src/index.js",
+  "scripts": {
+    "init": "npm install && cd example && npm install --legacy-peer-deps",
+    "start": "run-p start:lib start:md start:example",
+    "build": "run-s build:lib build:md build:example",
+    "build:lib": "microbundle --no-compress --format modern,cjs --jsx React.createElement --jsxFragment React.Fragment",
+    "build:md": "create-md",
+    "start:md": "create-md --watch",
+    "start:lib": "microbundle watch --no-compress --format modern,cjs --jsx React.createElement --jsxFragment React.Fragment",
+    "test": "run-s test:unit test:lint test:build",
+    "test:build": "run-s build",
+    "test:lint": "eslint .",
+    "test:unit": "cross-env CI=1 react-scripts test --env=jsdom",
+    "test:watch": "react-scripts test --env=jsdom",
+    "build:example": "cd example && npm run build",
+    "start:example": "cd example && npm run start",
+    "deploy": "gh-pages -d example/build",
+    "prettier": "prettier --config .prettierrc --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kne-union/react-function-select.git"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --config .prettierrc --write",
+      "git add"
+    ]
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "linzp",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kne-union/react-function-select/issues"
+  },
+  "homepage": "https://github.com/kne-union/react-function-select#readme",
+  "peerDependencies": {
+    "antd": "4.x",
+    "prop-types": ">=15.x",
+    "react": ">=16.x",
+    "react-dom": ">=16.x"
+  },
+  "devDependencies": {
+    "@kne/md-doc": "^0.1.6",
+    "antd": "^4.18.9",
+    "cross-env": "^7.0.3",
+    "gh-pages": "^3.2.3",
+    "husky": "^7.0.4",
+    "microbundle": "^0.14.2",
+    "node-sass": "^7.0.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.5.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1"
+  },
+  "dependencies": {
+    "@kne/antd-enhance": "^0.1.10",
+    "classnames": "^2.3.1"
+  }
+}
