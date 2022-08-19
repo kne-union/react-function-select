@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Row, Col, Checkbox, Result, Spin, Space, Tag, Anchor, Select, Button, message, Badge } from 'antd';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Modal, Row, Col, Checkbox, Result, Spin, Space, Tag, Menu, Select, Button, message, Badge } from 'antd';
 import { withLayer } from "@kne/antd-enhance";
 import { apis as _apis } from './preset';
-const getCount = (data, id, selectedKeys) => {
-	const childId = (data || []).filter(item => item.parentCode === id && selectedKeys.indexOf(item.code) > -1).map(item => item.code);
+import uniq from 'lodash/uniq';
+
+const getCount = (data,code,ids,sliceLength) => {
+	const childId=ids.filter(id=>data.some(item=>code ===item.code && item.code === id.slice(0,sliceLength)));
 	return childId.length;
 }
 
@@ -37,12 +39,13 @@ const SearchInput = ({ onChange }) => {
 		onChange && onChange(value);
 		setValue(null);
 		setData([]);
-	}} showSearch placeholder="输入行业关键词" style={{ width: '250px' }}
+	}} showSearch placeholder="输入职能关键词" style={{ width: '250px' }}
 		defaultActiveFirstOption={false}
 		showArrow={false}
 		notFoundContent={null}
 		onSearch={(value) => {
-			return apis.searchIndustries(value).then((list) => {
+			return apis.searchfunctions(value).then((list) => {
+				console.log(111,list)
 				setData(list);
 			});
 		}}
@@ -51,31 +54,48 @@ const SearchInput = ({ onChange }) => {
 
 export const apis = _apis;
 
-export const DisplayIndustry = ({ id, children }) => {
-	return <RemoteData loader={apis.getIndustry} options={id}>{children}</RemoteData>
+export const DisplayFunction = ({ id, children }) => {
+	return <RemoteData loader={apis.getFunction} options={id}>{children}</RemoteData>
 };
 
 export { default as preset } from './preset';
 
 
-const IndustrySelect = ({ onCancel, title, size, defaultValue, onChange, modalTitleRight, ...props }) => {
-	const [industries, setIndustries] = useState(defaultValue);
-	const appendCity = (code) => {
+const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onChange, modalTitleRight, ...props }) => {
+	const [functions, setfunctions] = useState(defaultValue);
+	const [selectedKeys, setSelectedKeys] = useState();
+	const [secondSelectedKeys, setSecondSelectedKeys] = useState();
+
+	const secondList = useMemo(() => {
+		return apis.getChildById(dataSource, selectedKeys);
+	}, [dataSource, selectedKeys]);
+
+	const thirdList = useMemo(() => {
+		return apis.getChildById(dataSource, secondSelectedKeys)
+	}, [dataSource, secondSelectedKeys]);
+
+	useEffect(() => {
+		if (Array.isArray(secondList) && secondList.length > 0) {
+			setSecondSelectedKeys(secondList[0].code);
+		}
+	}, [secondList]);
+
+	const appendFunc = (code) => {
 		if (size === 1) {
-			setIndustries([code]);
+			setfunctions([code]);
 			onChange([code]);
 			return;
 		}
-		if (industries.length >= size) {
+		if (functions.length >= size) {
 			message.error(`最多选择${size}个`);
 			return;
 		}
-		const _citys = JSON.parse(JSON.stringify(industries))
-		_citys.push(code);
-		setIndustries([..._citys]);
+		const _Funcs = JSON.parse(JSON.stringify(functions))
+		_Funcs.push(code);
+		setfunctions([..._Funcs]);
 	};
-	const removeCity = (code) => {
-		setIndustries((list) => {
+	const removeFunc = (code) => {
+		setfunctions((list) => {
 			const newList = list.slice(0);
 			const index = list.indexOf(code);
 			newList.splice(index, 1);
@@ -84,120 +104,137 @@ const IndustrySelect = ({ onCancel, title, size, defaultValue, onChange, modalTi
 	};
 
 	return <Modal width={1000} centered {...props} onCancel={onCancel}
-	title={<Row align="middle" justify="space-between">
-		<Col>{title}</Col>
-		<Col pull={2}><SearchInput
+		title={<Row align="middle" justify="space-between">
+			<Col>{title}</Col>
+			<Col pull={2}><SearchInput
 
-			onChange={(value) => {
-				appendCity(value);
-			}} /></Col>
-		{modalTitleRight && <Col pull={2}>
-			{modalTitleRight}
-		</Col>}
-	</Row>} footer={null}>
-		<RemoteData loader={apis.getAllList}>{(dataSource) => {
-			return <>
-				<Row wrap={false}>
-					<Col span={4} style={{ height: "500px" }}>
-						<div style={{ overflowY: 'auto', height: "100%" }}>
-							<RemoteData loader={apis.getLeftList} >{(data) => {
-								return <Anchor bounds={0} showInkInFixed={false} affix={false} getCurrentAnchor={(activeLink) => {
-									if (activeLink) {
-										return activeLink
-									}
-									return `#${data[0].chName}`
-								}}>
-									{data.map(item => {
-										return <Anchor.Link key={item.code} title={<Space>
-											<span>{item.chName}</span>
-											<Badge count={getCount(dataSource, item.code, industries)} />
-										</Space>} href={`#${item.chName}`} />
-
-									})}
-								</Anchor>
-							}}</RemoteData>
-						</div>
-					</Col>
-					<Col flex={1} style={{
-						display: 'flex', flexDirection: 'column', height: '500px'
-					}}>
-						<div style={{ overflowY: 'auto', height: "100%" }}>
-							<Row style={{ flex: 1 }}>
-								<Col offset={1} flex={1}>
-									<Space direction="vertical" style={{ width: '100%' }}>
-										<RemoteData loader={apis.getAllRightList}>{(data) => {
-											return data.map((first, index) => {
-												return <Space direction='vertical' key={first.code} size={16} style={{width: "100%"}}>
-													<div style={{ fontWeight: 500, marginTop: index !== 0 ? 32 : 0 }} className="right-first-title" id={first.chName}>{first.chName}</div>
-													<Row wrap justify='space-between'>
-														{(first.childList || []).map(({ code, chName }) => <Col span={8} key={code}>
-															<Checkbox
-															checked={industries.indexOf(code) > -1}
-															onChange={(e) => {
-																const checked = e.target.checked;
-																if (checked) {
-																	appendCity(code);
-																} else {
-																	removeCity(code);
-																}
-															}}
-														>{chName}</Checkbox>
-														</Col>)}
-													</Row>
+				onChange={(value) => {
+					appendFunc(value);
+				}} /></Col>
+			{modalTitleRight && <Col pull={2}>
+				{modalTitleRight}
+			</Col>}
+		</Row>} footer={null}>
+		<Row wrap={false}>
+			<Col span={5} style={{ height: "500px" }}>
+				<div style={{ overflowY: 'auto', height: "100%" }}>
+					<RemoteData loader={apis.getLeftList} onLoad={(data) => {
+						data && data.length && setSelectedKeys(data[0].code);
+					}}>{(data) => {
+						return <Menu selectedKeys={selectedKeys} onSelect={(item) => {
+							setSelectedKeys(item.key);
+						}}>
+							{data.map((item) => <Menu.Item key={item.code}>
+								<Space>
+									<span>{item.chName}</span>
+									<Badge count={getCount(dataSource,item.code, functions,3)} />
+								</Space>
+							</Menu.Item>)}
+						</Menu>;
+					}}</RemoteData>
+				</div>
+			</Col>
+			<Col span={5}>
+				<div style={{ overflowY: 'auto', height: "500px" }}>
+					<Row style={{ flex: 1 }}>
+						<Col offset={1} flex={1}>
+							<Space direction="vertical" style={{ width: '100%' }}>
+								{
+									<Space direction='vertical' size={16} style={{ width: "100%" }}>
+										<Menu selectedKeys={secondSelectedKeys} onSelect={(item) => {
+											setSecondSelectedKeys(item.key);
+										}}>
+											{secondList.map((item) => <Menu.Item key={item.code}>
+												<Space>
+													<span>{item.chName}</span>
+													<Badge count={getCount(dataSource,item.code, functions,6)} />
 												</Space>
-											})
-										}}</RemoteData>
+											</Menu.Item>)}
+										</Menu>
 
 									</Space>
-								</Col>
-							</Row>
-						</div>
-					</Col>
-				</Row>
-				<Row wrap={false} align="middle">
-					<Col offset={1} style={{
-						whiteSpace: 'nowrap'
-					}}>已选{size > 1 ? <>（{industries.length}/{size}）</> : null}：</Col>
-					<Col flex={1} style={{
-						maxHeight: '70px', overflowY: 'auto'
-					}}>
-						{industries.map((id) => {
-							return <DisplayIndustry key={id} id={id}>{(data) => {
-								return <Tag closable={size > 1} onClose={() => {
-									removeCity(id);
-								}}>{data.chName}</Tag>;
-							}}</DisplayIndustry>
-						})}
-					</Col>
-					{size > 1 ? <Col>
-						<Space>
-							<Button onClick={onCancel}>取消</Button>
-							<Button type="primary" onClick={() => {
-								onChange(industries);
-							}}>确认</Button>
 
-						</Space>
-					</Col> : null}
+								}
+							</Space>
+						</Col>
+					</Row>
+				</div>
+			</Col>
+			<Col flex={1} style={{
+				display: 'flex', flexDirection: 'column', height: '500px'
+			}}>
+				<div style={{ overflowY: 'auto', height: "100%" }}>
+					<Row style={{ flex: 1 }}>
+						<Col offset={1} flex={1}>
+							<Space direction="vertical" style={{ width: '100%' }}>
+								{
+									<Space direction='vertical' size={16} style={{ width: "100%" }}>
+										<Row wrap justify='space-between'>
+											{(thirdList || []).map(({ code, chName }) => <Col span={8} key={code}>
+												<Checkbox
+													checked={functions.indexOf(code) > -1}
+													onChange={(e) => {
+														const checked = e.target.checked;
+														if (checked) {
+															appendFunc(code);
+														} else {
+															removeFunc(code);
+														}
+													}}
+												>{chName}</Checkbox>
+											</Col>)}
+										</Row>
+									</Space>
+								}
+							</Space>
+						</Col>
+					</Row>
+				</div>
+			</Col>
+		</Row>
+		<Row wrap={false} align="middle">
+			<Col offset={1} style={{
+				whiteSpace: 'nowrap'
+			}}>已选{size > 1 ? <>（{functions.length}/{size}）</> : null}：</Col>
+			<Col flex={1} style={{
+				maxHeight: '70px', overflowY: 'auto'
+			}}>
+				{functions.map((id) => {
+					return <DisplayFunction key={id} id={id}>{(data) => {
+						return <Tag closable={size > 1} onClose={() => {
+							removeFunc(id);
+						}}>{data.chName}</Tag>;
+					}}</DisplayFunction>
+				})}
+			</Col>
+			{size > 1 ? <Col>
+				<Space>
+					<Button onClick={onCancel}>取消</Button>
+					<Button type="primary" onClick={() => {
+						onChange(functions);
+					}}>确认</Button>
 
-				</Row>
-			</>
-		}}</RemoteData>
+				</Space>
+			</Col> : null}
+		</Row>
 	</Modal>
 };
 
-IndustrySelect.defaultProps = {
-	title: "请选择行业",
+export const createFunctionSelect = withLayer(({ close, onChange, ...props }) => {
+	return <RemoteData loader={apis.getAllList}>{(dataSource) => {
+		return <FunctionSelect {...props} dataSource={dataSource} onCancel={close} onChange={(value) => {
+			onChange && onChange(value);
+			close();
+		}} />
+	}}</RemoteData>
+});
+
+FunctionSelect.defaultProps = {
+	title: "请选择职能",
 	size: 1,
 	defaultValue: [],
 	onChange: () => {
 	}
 };
 
-export const createIndustrySelect = withLayer(({ close, onChange, ...props }) => {
-	return <IndustrySelect {...props} onCancel={close} onChange={(value) => {
-		onChange && onChange(value);
-		close();
-	}} />
-});
-
-export default IndustrySelect;
+export default FunctionSelect;

@@ -19,6 +19,25 @@
         "name": "这里填写包导出名称(这是一个注释字段，需要添加到[scope]中)",
         "packageName": "这里填写包名(这是一个注释字段，需要添加到[scope]中)"
       }
+    },
+    {
+      "title": "职能单选",
+      "description": "单选",
+      "code": "./base2.js",
+      "scope": [
+        {
+          "name": "FunctionSelect",
+          "packageName": "@kne/react-function-select"
+        },
+        {
+          "name": "Antd",
+          "packageName": "antd"
+        }
+      ],
+      "__scope_notes": {
+        "name": "这里填写包导出名称(这是一个注释字段，需要添加到[scope]中)",
+        "packageName": "这里填写包名(这是一个注释字段，需要添加到[scope]中)"
+      }
     }
   ]
 }

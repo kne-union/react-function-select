@@ -3,7 +3,7 @@ export const apis = {
         let cache;
         return () => {
             if (!cache) {
-                cache = import('./industry.json');
+                cache = import('./function.json');
             }
             return cache;
         };
@@ -15,44 +15,32 @@ export const apis = {
     },
     getLeftList: () => {
         return apis.loadData().then(({data}) => {
-            return data.filter(item=>item.level === '0'&&item.code!=="000")
-        });
-    },
-    getRightList: (id) => {
-        return apis.loadData().then(({data}) => {
-            return data.filter(item=>item.level === '1'&&item.parentCode===id)
+            return data.filter(item=>!item.parentCode)
         });
     },
     getChildById: (data,id) => {
-        return data.filter(item=>item.level === '1'&&item.parentCode===id)
+        return data.filter(item=>item.parentCode===id)
     },
-    getAllRightList: ()=>{
-        return apis.loadData().then(({data}) => {
-            return data.filter(item=>item.level === '0'&&item.code!=="000").map(item=>{
-                return {...item,childList: apis.getChildById(data,item.code)}
-            })
-        });
-    },
-    getIndustry: (id) => {
+    getFunction: (id) => {
         return apis.loadData().then(({data}) => {
             if(Array.isArray(id)){
                 return data.filter(item=>{
-                    return id.some(i=>item.level === '1'&&item.code===i)
+                    return id.some(i=>item.code===i)
                 })
             }
             if(typeof id === 'string'){
-                return data.find(item=>item.level === '1'&&item.code===id)
+                return data.find(item=>item.code===id)
             }
             return null
         });
     }, 
-    searchIndustries: (value) => {
+    searchfunctions: (value) => {
         if (!value) {
             return Promise.resolve([]);
         }
         return apis.loadData().then(({data}) => {
             return data.filter(item=>item.level === '1').filter((item) => {
-                return ['pinyin', 'chName', 'shortName', 'enName'].some((name) => {
+                return ['chName', 'shortName', 'enName'].some((name) => {
                     return item[name].toUpperCase().indexOf(value.toUpperCase()) > -1;
                 });
             }).map((item) => {

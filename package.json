@@ -1,7 +1,7 @@
 {
   "name": "@kne/react-function-select",
-  "version": "0.1.0",
-  "description": "行业选择器",
+  "version": "0.1.1",
+  "description": "职能选择器",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.js",
