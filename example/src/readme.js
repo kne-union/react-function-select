@@ -1,9 +1,9 @@
-import * as component_3 from '@kne/react-industry-select';
-import * as component_4 from 'antd';
+import * as component_19 from '@kne/react-function-select';
+import * as component_20 from 'antd';
 const readmeConfig = {
-    name: `@kne/react-industry-select`,
-    description: `行业选择器`,
-    summary: `<p>行业选择器，可支持多选和单选，可以通过覆盖preset的apis的方法扩展此组件</p>`,
+    name: `@kne/react-function-select`,
+    description: `职能选择器`,
+    summary: `<p>职能选择器，可支持多选和单选，可以通过覆盖preset的apis的方法扩展此组件</p>`,
     api: `<h3>其他属性参考antd modal的props</h3>
 <table>
 <thead>
@@ -41,9 +41,9 @@ const readmeConfig = {
 </tr>
 </tbody>
 </table>
-<h3>IndustrySelect.createIndustrySelect</h3>
+<h3>FunctionSelect.createFunctionSelect</h3>
 <p>参数同上</p>
-<h3>IndustrySelect.DisplayIndustry</h3>
+<h3>FunctionSelect.DisplayFunction</h3>
 <h4>这是一个组件</h4>
 <table>
 <thead>
@@ -101,43 +101,37 @@ const readmeConfig = {
 <tbody>
 <tr>
 <td>loadData</td>
-<td>获取行业数据，默认采用内置数据</td>
+<td>获取职能数据，默认采用内置数据</td>
 <td>function</td>
 <td>-</td>
 </tr>
 <tr>
 <td>getAllList</td>
-<td>获取所有行业数据列表</td>
+<td>获取所有职能数据列表</td>
 <td>function</td>
 <td>-</td>
 </tr>
 <tr>
 <td>getLeftList</td>
-<td>获取左侧一级行业列表</td>
+<td>获取左侧一级职能列表</td>
 <td>funciton</td>
 <td>-</td>
 </tr>
 <tr>
-<td>getAllRightList</td>
-<td>获取包含一级二级数据列表</td>
-<td>function</td>
-<td>-</td>
-</tr>
-<tr>
-<td>getIndustry(id)</td>
-<td>传入行业ID返回行业数据</td>
+<td>getFunction(id)</td>
+<td>传入职能ID返回职能数据</td>
 <td>function</td>
 <td>-</td>
 </tr>
 <tr>
 <td>getChildById(id)</td>
-<td>通过一级id，获取二级行业</td>
+<td>通过id，获取子级职能集合</td>
 <td>function</td>
 <td>-</td>
 </tr>
 <tr>
-<td>searchIndustries(searchStr)</td>
-<td>通过关键字搜索行业，支持拼音首字母缩写</td>
+<td>searchfunctions(searchStr)</td>
+<td>通过关键字搜索职能，支持拼音首字母缩写</td>
 <td>function</td>
 <td>-</td>
 </tr>
@@ -145,21 +139,21 @@ const readmeConfig = {
 </table>`,
     example: {
         isFull: false,
-        className: `react_industry_select_8c848`,
+        className: `react_function_select_fea97`,
         style: ``,
         list: [{
-    title: `行业类别多选`,
+    title: `职能多选`,
     description: `多选`,
-    code: `const {createIndustrySelect,DisplayIndustry}=IndustrySelect;
+    code: `const {createFunctionSelect,DisplayFunction}=FunctionSelect;
 const {Button}=Antd;
 
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState(["040","420"]);
+    const [v,setV]=useState(["007030237","007031239"]);
 
     return <Button onClick={()=>{
-        createIndustrySelect({
+        createFunctionSelect({
             defaultValue:v,
             size:3,
             onChange:(code)=>{
@@ -167,12 +161,12 @@ const BaseExample = ()=>{
             }
         })
     }}>
-        <DisplayIndustry id={v}>{(list)=>{
+      <DisplayFunction id={v}>{(list)=>{
             if(Array.isArray(list)){
                 return list.map(item=>item.chName).join(",")
             }
             return list&&list.chName
-        }}</DisplayIndustry>
+        }}</DisplayFunction>  
     </Button>
 };
 
@@ -180,27 +174,27 @@ render(<BaseExample />);
 
 `,
     scope: [{
-    name: "IndustrySelect",
-    packageName: "@kne/react-industry-select",
-    component: component_3
+    name: "FunctionSelect",
+    packageName: "@kne/react-function-select",
+    component: component_19
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_4
+    component: component_20
 }]
 },{
-    title: `行业类别单选`,
+    title: `职能单选`,
     description: `单选`,
-    code: `const {createIndustrySelect,DisplayIndustry}=IndustrySelect;
+    code: `const {createFunctionSelect,DisplayFunction}=FunctionSelect;
 const {Button}=Antd;
 
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState(["040"]);
+    const [v,setV]=useState(["007030237"]);
 
     return <Button onClick={()=>{
-        createIndustrySelect({
+        createFunctionSelect({
             defaultValue:v,
             size:1,
             onChange:(code)=>{
@@ -208,12 +202,12 @@ const BaseExample = ()=>{
             }
         })
     }}>
-        <DisplayIndustry id={v}>{(list)=>{
+        <DisplayFunction id={v}>{(list)=>{
             if(Array.isArray(list)){
                 return list.map(item=>item.chName).join(",")
             }
             return list&&list.chName
-        }}</DisplayIndustry>
+        }}</DisplayFunction>
     </Button>
 };
 
@@ -221,13 +215,13 @@ render(<BaseExample />);
 
 `,
     scope: [{
-    name: "IndustrySelect",
-    packageName: "@kne/react-industry-select",
-    component: component_3
+    name: "FunctionSelect",
+    packageName: "@kne/react-function-select",
+    component: component_19
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_4
+    component: component_20
 }]
 }]
     }
