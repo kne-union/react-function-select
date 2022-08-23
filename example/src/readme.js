@@ -1,5 +1,5 @@
-import * as component_19 from '@kne/react-function-select';
-import * as component_20 from 'antd';
+import * as component_7 from '@kne/react-function-select';
+import * as component_8 from 'antd';
 const readmeConfig = {
     name: `@kne/react-function-select`,
     description: `职能选择器`,
@@ -176,11 +176,11 @@ render(<BaseExample />);
     scope: [{
     name: "FunctionSelect",
     packageName: "@kne/react-function-select",
-    component: component_19
+    component: component_7
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_20
+    component: component_8
 }]
 },{
     title: `职能单选`,
@@ -217,11 +217,11 @@ render(<BaseExample />);
     scope: [{
     name: "FunctionSelect",
     packageName: "@kne/react-function-select",
-    component: component_19
+    component: component_7
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_20
+    component: component_8
 }]
 }]
     }

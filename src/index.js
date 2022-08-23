@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Modal, Row, Col, Checkbox, Result, Spin, Space, Tag, Menu, Select, Button, message, Badge } from 'antd';
 import { withLayer } from "@kne/antd-enhance";
 import { apis as _apis } from './preset';
-import uniq from 'lodash/uniq';
+import "./index.scss";
+import get from 'lodash/get';
 
 const getCount = (data,code,ids,sliceLength) => {
 	const childId=ids.filter(id=>data.some(item=>code ===item.code && item.code === id.slice(0,sliceLength)));
@@ -35,7 +36,7 @@ export const RemoteData = ({ loader, options, onLoad, children }) => {
 const SearchInput = ({ onChange }) => {
 	const [value, setValue] = useState(null);
 	const [data, setData] = useState([]);
-	return <Select value={value} onChange={(value) => {
+	return <Select className='function-modal-search' value={value} onChange={(value) => {
 		onChange && onChange(value);
 		setValue(null);
 		setData([]);
@@ -103,10 +104,11 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 		});
 	};
 
-	return <Modal width={1000} centered {...props} onCancel={onCancel}
+	return <Modal {...props} width={1000} centered 
+	wrapClassName="function-modal" onCancel={onCancel}
 		title={<Row align="middle" justify="space-between">
 			<Col>{title}</Col>
-			<Col pull={2}><SearchInput
+			<Col pull={1}><SearchInput
 
 				onChange={(value) => {
 					appendFunc(value);
@@ -114,10 +116,35 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 			{modalTitleRight && <Col pull={2}>
 				{modalTitleRight}
 			</Col>}
-		</Row>} footer={null}>
+		</Row>} footer={
+			<Space className='function-modal-footer' direction='vertical' size={12}>
+				<Row align='middle' justify='start'>
+					<Space wrap={false} size={8}>
+						<span style={{
+							whiteSpace: 'nowrap'
+						}}>已选{size > 1 ? <>（{functions.length}/{size}）</> : null}：</span>
+						{functions.map((id) => {
+							return <DisplayFunction key={id} id={id}>{(data) => {
+								return <Tag className='function-modal-tag' closable={size > 1} onClose={() => {
+									removeFunc(id);
+								}}>{get(data, "chName")}</Tag>;
+							}}</DisplayFunction>
+						})}
+					</Space>
+				</Row>
+				{size > 1 ? <Row justify='end'>
+					<Space size={8} >
+						<Button onClick={onCancel}>取消</Button>
+						<Button type="primary" onClick={() => {
+							onChange(functions);
+						}}>确认</Button>
+
+					</Space>
+				</Row>: null}
+			</Space>}>
 		<Row wrap={false}>
-			<Col span={5} style={{ height: "500px" }}>
-				<div style={{ overflowY: 'auto', height: "100%" }}>
+			<Col className='function-modal-left'>
+				<div className='function-modal-left-overflow'>
 					<RemoteData loader={apis.getLeftList} onLoad={(data) => {
 						data && data.length && setSelectedKeys(data[0].code);
 					}}>{(data) => {
@@ -134,14 +161,10 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 					}}</RemoteData>
 				</div>
 			</Col>
-			<Col span={5}>
-				<div style={{ overflowY: 'auto', height: "500px" }}>
+			<Col className='function-modal-center'>
+				<div style={{ overflowY: 'auto',height: "100%"}}>
 					<Row style={{ flex: 1 }}>
-						<Col offset={1} flex={1}>
-							<Space direction="vertical" style={{ width: '100%' }}>
-								{
-									<Space direction='vertical' size={16} style={{ width: "100%" }}>
-										<Menu selectedKeys={secondSelectedKeys} onSelect={(item) => {
+					<Menu selectedKeys={secondSelectedKeys} onSelect={(item) => {
 											setSecondSelectedKeys(item.key);
 										}}>
 											{secondList.map((item) => <Menu.Item key={item.code}>
@@ -151,20 +174,12 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 												</Space>
 											</Menu.Item>)}
 										</Menu>
-
-									</Space>
-
-								}
-							</Space>
-						</Col>
 					</Row>
 				</div>
 			</Col>
-			<Col flex={1} style={{
-				display: 'flex', flexDirection: 'column', height: '500px'
-			}}>
+			<Col flex={1}  className='function-modal-right'>
 				<div style={{ overflowY: 'auto', height: "100%" }}>
-					<Row style={{ flex: 1 }}>
+					<Row style={{ flex: 1 }} className="function-modal-right-content">
 						<Col offset={1} flex={1}>
 							<Space direction="vertical" style={{ width: '100%' }}>
 								{
@@ -191,31 +206,6 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 					</Row>
 				</div>
 			</Col>
-		</Row>
-		<Row wrap={false} align="middle">
-			<Col offset={1} style={{
-				whiteSpace: 'nowrap'
-			}}>已选{size > 1 ? <>（{functions.length}/{size}）</> : null}：</Col>
-			<Col flex={1} style={{
-				maxHeight: '70px', overflowY: 'auto'
-			}}>
-				{functions.map((id) => {
-					return <DisplayFunction key={id} id={id}>{(data) => {
-						return <Tag closable={size > 1} onClose={() => {
-							removeFunc(id);
-						}}>{data.chName}</Tag>;
-					}}</DisplayFunction>
-				})}
-			</Col>
-			{size > 1 ? <Col>
-				<Space>
-					<Button onClick={onCancel}>取消</Button>
-					<Button type="primary" onClick={() => {
-						onChange(functions);
-					}}>确认</Button>
-
-				</Space>
-			</Col> : null}
 		</Row>
 	</Modal>
 };
