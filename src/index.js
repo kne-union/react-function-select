@@ -28,15 +28,17 @@ export const RemoteData = ({ loader, options, onLoad, children }) => {
 		return <Result status="error" title="获取数据发生错误" subTitle={error.message} />
 	}
 	if (!data) {
-		return <Spin />
+		return null
 	}
 	return children(data)
 };
 
-const SearchInput = ({ onChange }) => {
+const SearchInput = ({ onChange,labelInValue,functionsValue }) => {
 	const [value, setValue] = useState(null);
 	const [data, setData] = useState([]);
-	return <Select className='function-modal-search' value={value} onChange={(value) => {
+	return <Select labelInValue={labelInValue} className='function-modal-search' value={value} onChange={(value) => {
+
+		if(functionsValue.indexOf(!labelInValue?value:get(value,'value'))>-1) return;
 		onChange && onChange(value);
 		setValue(null);
 		setData([]);
@@ -46,7 +48,6 @@ const SearchInput = ({ onChange }) => {
 		notFoundContent={null}
 		onSearch={(value) => {
 			return apis.searchfunctions(value).then((list) => {
-				console.log(111,list)
 				setData(list);
 			});
 		}}
@@ -62,8 +63,8 @@ export const DisplayFunction = ({ id, children }) => {
 export { default as preset } from './preset';
 
 
-const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onChange, modalTitleRight, ...props }) => {
-	const [functions, setfunctions] = useState(defaultValue);
+const FunctionSelect = ({ labelInValue,dataSource, onCancel, title, size, defaultValue, onChange, modalTitleRight, ...props }) => {
+	const [functions, setfunctions] = useState(defaultValue||[]);
 	const [selectedKeys, setSelectedKeys] = useState();
 	const [secondSelectedKeys, setSecondSelectedKeys] = useState();
 
@@ -98,18 +99,22 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 	const removeFunc = (code) => {
 		setfunctions((list) => {
 			const newList = list.slice(0);
-			const index = list.indexOf(code);
+			const index = labelInValue?list.map(item=>get(item,'value')).indexOf(code):list.indexOf(code);
 			newList.splice(index, 1);
 			return newList;
 		});
 	};
+	const functionsValue=useMemo(() => {
+		return labelInValue?functions.map(item=>get(item,'value',"")):functions;
+	}, [functions,labelInValue]);
 
 	return <Modal {...props} width={1000} centered 
 	wrapClassName="function-modal" onCancel={onCancel}
 		title={<Row align="middle" justify="space-between">
 			<Col>{title}</Col>
 			<Col pull={1}><SearchInput
-
+				functionsValue={functionsValue}
+				labelInValue={labelInValue}
 				onChange={(value) => {
 					appendFunc(value);
 				}} /></Col>
@@ -119,14 +124,14 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 		</Row>} footer={
 			<Space className='function-modal-footer' direction='vertical' size={12}>
 				<Row align='middle' justify='start'>
-					<Space wrap={false} size={8}>
+					<Space wrap={false} size={8} className='industry-modal-selected'>
 						<span style={{
 							whiteSpace: 'nowrap'
 						}}>已选{size > 1 ? <>（{functions.length}/{size}）</> : null}：</span>
-						{functions.map((id) => {
+						{functionsValue.map((id,index) => {
 							return <DisplayFunction key={id} id={id}>{(data) => {
 								return <Tag className='function-modal-tag' closable={size > 1} onClose={() => {
-									removeFunc(id);
+									removeFunc(get(data,'code'));
 								}}>{get(data, "chName")}</Tag>;
 							}}</DisplayFunction>
 						})}
@@ -154,7 +159,7 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 							{data.map((item) => <Menu.Item key={item.code}>
 								<Space>
 									<span>{item.chName}</span>
-									<Badge count={getCount(dataSource,item.code, functions,3)} />
+									<Badge count={getCount(dataSource,item.code, functionsValue,3)} />
 								</Space>
 							</Menu.Item>)}
 						</Menu>;
@@ -170,7 +175,7 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 											{secondList.map((item) => <Menu.Item key={item.code}>
 												<Space>
 													<span>{item.chName}</span>
-													<Badge count={getCount(dataSource,item.code, functions,6)} />
+													<Badge count={getCount(dataSource,item.code,functionsValue,6)} />
 												</Space>
 											</Menu.Item>)}
 										</Menu>
@@ -185,13 +190,13 @@ const FunctionSelect = ({ dataSource, onCancel, title, size, defaultValue, onCha
 								{
 									<Space direction='vertical' size={16} style={{ width: "100%" }}>
 										<Row wrap justify='space-between'>
-											{(thirdList || []).map(({ code, chName }) => <Col span={8} key={code}>
+											{(thirdList || []).map(({ code, chName },index) => <Col span={8} key={code}>
 												<Checkbox
-													checked={functions.indexOf(code) > -1}
+													checked={functionsValue.indexOf(code) > -1}
 													onChange={(e) => {
 														const checked = e.target.checked;
 														if (checked) {
-															appendFunc(code);
+															appendFunc(labelInValue?{value:code,label:chName}:code);
 														} else {
 															removeFunc(code);
 														}
@@ -223,6 +228,7 @@ FunctionSelect.defaultProps = {
 	title: "请选择职能",
 	size: 1,
 	defaultValue: [],
+	labelInValue:false,
 	onChange: () => {
 	}
 };

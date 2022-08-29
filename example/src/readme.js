@@ -1,5 +1,5 @@
-import * as component_7 from '@kne/react-function-select';
-import * as component_8 from 'antd';
+import * as component_43 from '@kne/react-function-select';
+import * as component_44 from 'antd';
 const readmeConfig = {
     name: `@kne/react-function-select`,
     description: `职能选择器`,
@@ -118,6 +118,12 @@ const readmeConfig = {
 <td>-</td>
 </tr>
 <tr>
+<td>getFunctionByName(name)</td>
+<td>传入职能name返回职能数据</td>
+<td>function</td>
+<td>-</td>
+</tr>
+<tr>
 <td>getFunction(id)</td>
 <td>传入职能ID返回职能数据</td>
 <td>function</td>
@@ -135,6 +141,12 @@ const readmeConfig = {
 <td>function</td>
 <td>-</td>
 </tr>
+<tr>
+<td>labelInValue</td>
+<td>value是否包含label</td>
+<td>boolean</td>
+<td>false</td>
+</tr>
 </tbody>
 </table>`,
     example: {
@@ -150,10 +162,11 @@ const {Button}=Antd;
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState(["007030237","007031239"]);
+    const [v,setV]=useState([{label:"sdsf",value:"007030237"}]);
 
     return <Button onClick={()=>{
         createFunctionSelect({
+            labelInValue:true,
             defaultValue:v,
             size:3,
             onChange:(code)=>{
@@ -161,7 +174,7 @@ const BaseExample = ()=>{
             }
         })
     }}>
-      <DisplayFunction id={v}>{(list)=>{
+      <DisplayFunction id={v.map(item=>item.value)}>{(list)=>{
             if(Array.isArray(list)){
                 return list.map(item=>item.chName).join(",")
             }
@@ -176,11 +189,11 @@ render(<BaseExample />);
     scope: [{
     name: "FunctionSelect",
     packageName: "@kne/react-function-select",
-    component: component_7
+    component: component_43
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_8
+    component: component_44
 }]
 },{
     title: `职能单选`,
@@ -217,11 +230,11 @@ render(<BaseExample />);
     scope: [{
     name: "FunctionSelect",
     packageName: "@kne/react-function-select",
-    component: component_7
+    component: component_43
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_8
+    component: component_44
 }]
 }]
     }

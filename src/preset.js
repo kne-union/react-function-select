@@ -34,12 +34,25 @@ export const apis = {
             return null
         });
     }, 
+    getFunctionByName:(name)=>{
+        return apis.loadData().then(({data}) => {
+            if(Array.isArray(name)){
+                return data.filter(item=>{
+                    return name.some(i=>item.chName===i)
+                })
+            }
+            if(typeof name === 'string'){
+                return data.find(item=>item.chName===name)
+            }
+            return null
+        });
+    },
     searchfunctions: (value) => {
         if (!value) {
             return Promise.resolve([]);
         }
         return apis.loadData().then(({data}) => {
-            return data.filter(item=>item.level === '1').filter((item) => {
+            return data.filter(item=>item.code.length>6).filter((item) => {
                 return ['chName', 'shortName', 'enName'].some((name) => {
                     return item[name].toUpperCase().indexOf(value.toUpperCase()) > -1;
                 });

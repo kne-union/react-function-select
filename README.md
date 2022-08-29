@@ -34,10 +34,11 @@ const {Button}=Antd;
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState(["007030237","007031239"]);
+    const [v,setV]=useState([{label:"sdsf",value:"007030237"}]);
 
     return <Button onClick={()=>{
         createFunctionSelect({
+            labelInValue:true,
             defaultValue:v,
             size:3,
             onChange:(code)=>{
@@ -45,7 +46,7 @@ const BaseExample = ()=>{
             }
         })
     }}>
-      <DisplayFunction id={v}>{(list)=>{
+      <DisplayFunction id={v.map(item=>item.value)}>{(list)=>{
             if(Array.isArray(list)){
                 return list.map(item=>item.chName).join(",")
             }
@@ -129,6 +130,8 @@ render(<BaseExample />);
 | loadData                | 获取职能数据，默认采用内置数据|function|-|
 | getAllList          |获取所有职能数据列表|function|-|
 | getLeftList            |获取左侧一级职能列表|funciton|-|
+| getFunctionByName(name)             |传入职能name返回职能数据|function|-|
 | getFunction(id)             |传入职能ID返回职能数据|function|-|
 | getChildById(id)     |通过id，获取子级职能集合|function|-|
 | searchfunctions(searchStr) |通过关键字搜索职能，支持拼音首字母缩写|function|-|
+|  labelInValue  | value是否包含label | boolean | false |
