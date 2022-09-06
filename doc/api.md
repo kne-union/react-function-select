@@ -36,3 +36,4 @@
 | getChildById(id)     |通过id，获取子级职能集合|function|-|
 | searchfunctions(searchStr) |通过关键字搜索职能，支持拼音首字母缩写|function|-|
 |  labelInValue  | value是否包含label | boolean | false |
+|  selectAll  | 允许选择所有层级level | boolean | false |

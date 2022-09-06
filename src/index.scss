@@ -3,7 +3,7 @@
   overflow: hidden;
   .ant-modal-body{
     padding:0;
-    height: calc(100vh - 240px);
+    height: calc(100vh - 400px);
     overflow: hidden;
     > .ant-row{
       height: 100%;
@@ -11,9 +11,6 @@
   }
   .ant-modal-footer{
     text-align: left;
-  }
-  .ant-anchor-ink::before{
-    background-color: transparent;
   }
   .ant-badge-count{
     background-color: rgba(92, 184, 178, 0.1);
@@ -33,11 +30,6 @@
     border:none;
     padding:7px 8px;
   }
-  &-left,&-center{
-    flex-shrink: 0;
-    width: 210px;
-    border-right: solid 1px #F1F1F1;
-  }
   .ant-menu-vertical{
     border: none;
     width: 100%;
@@ -51,6 +43,12 @@
       }
     }
   }
+  &-left,&-center{
+    flex-shrink: 0;
+    width: 210px;
+    border-right: solid 1px #F1F1F1;
+  }
+
 
   &-selected{
     line-height: 30px;
@@ -92,5 +90,9 @@
   }
   &-footer{
     width: 100%;
+  }
+  &-count{
+    color:#5CB8B2;
+    font-weight: normal;
   }
 }

@@ -4,23 +4,25 @@ const {Button}=Antd;
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState(["002002013"]);
+    const [v,setV]=useState([{label:"sdsf",value:"002002013"}]);
 
     return <Button onClick={()=>{
         createFunctionSelect({
+            labelInValue:true,
             defaultValue:v,
-            size:1,
+            size:3,
+            selectLevel:3,
             onChange:(code)=>{
                 setV(code);
             }
         })
     }}>
-        <DisplayFunction id={v}>{(list)=>{
+      <DisplayFunction id={v.map(item=>item.value)}>{(list)=>{
             if(Array.isArray(list)){
                 return list.map(item=>item.chName).join(",")
             }
             return list&&list.chName
-        }}</DisplayFunction>
+        }}</DisplayFunction>  
     </Button>
 };
 

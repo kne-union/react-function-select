@@ -1,5 +1,5 @@
-import * as component_43 from '@kne/react-function-select';
-import * as component_44 from 'antd';
+import * as component_93 from '@kne/react-function-select';
+import * as component_94 from 'antd';
 const readmeConfig = {
     name: `@kne/react-function-select`,
     description: `职能选择器`,
@@ -147,6 +147,12 @@ const readmeConfig = {
 <td>boolean</td>
 <td>false</td>
 </tr>
+<tr>
+<td>selectAll</td>
+<td>允许选择所有层级level</td>
+<td>boolean</td>
+<td>false</td>
+</tr>
 </tbody>
 </table>`,
     example: {
@@ -162,7 +168,7 @@ const {Button}=Antd;
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState([{label:"sdsf",value:"007030237"}]);
+    const [v,setV]=useState([{label:"sdsf",value:"002002013"}]);
 
     return <Button onClick={()=>{
         createFunctionSelect({
@@ -189,11 +195,11 @@ render(<BaseExample />);
     scope: [{
     name: "FunctionSelect",
     packageName: "@kne/react-function-select",
-    component: component_43
+    component: component_93
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_44
+    component: component_94
 }]
 },{
     title: `职能单选`,
@@ -204,7 +210,7 @@ const {Button}=Antd;
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState(["007030237"]);
+    const [v,setV]=useState(["002002013"]);
 
     return <Button onClick={()=>{
         createFunctionSelect({
@@ -230,11 +236,54 @@ render(<BaseExample />);
     scope: [{
     name: "FunctionSelect",
     packageName: "@kne/react-function-select",
-    component: component_43
+    component: component_93
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_44
+    component: component_94
+}]
+},{
+    title: `职能多选层级`,
+    description: `多选`,
+    code: `const {createFunctionSelect,DisplayFunction}=FunctionSelect;
+const {Button}=Antd;
+
+const {useState}=React;
+
+const BaseExample = ()=>{
+    const [v,setV]=useState([{label:"sdsf",value:"002002013"}]);
+
+    return <Button onClick={()=>{
+        createFunctionSelect({
+            labelInValue:true,
+            defaultValue:v,
+            size:3,
+            selectLevel:3,
+            onChange:(code)=>{
+                setV(code);
+            }
+        })
+    }}>
+      <DisplayFunction id={v.map(item=>item.value)}>{(list)=>{
+            if(Array.isArray(list)){
+                return list.map(item=>item.chName).join(",")
+            }
+            return list&&list.chName
+        }}</DisplayFunction>  
+    </Button>
+};
+
+render(<BaseExample />);
+
+`,
+    scope: [{
+    name: "FunctionSelect",
+    packageName: "@kne/react-function-select",
+    component: component_93
+},{
+    name: "Antd",
+    packageName: "antd",
+    component: component_94
 }]
 }]
     }

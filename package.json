@@ -1,6 +1,6 @@
 {
   "name": "@kne/react-function-select",
-  "version": "0.1.8",
+  "version": "0.2.1",
   "description": "职能选择器",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",

@@ -34,7 +34,7 @@ const {Button}=Antd;
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState([{label:"sdsf",value:"007030237"}]);
+    const [v,setV]=useState([{label:"sdsf",value:"002002013"}]);
 
     return <Button onClick={()=>{
         createFunctionSelect({
@@ -70,7 +70,7 @@ const {Button}=Antd;
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState(["007030237"]);
+    const [v,setV]=useState(["002002013"]);
 
     return <Button onClick={()=>{
         createFunctionSelect({
@@ -87,6 +87,43 @@ const BaseExample = ()=>{
             }
             return list&&list.chName
         }}</DisplayFunction>
+    </Button>
+};
+
+render(<BaseExample />);
+
+```
+
+- 职能多选层级
+- 多选
+- FunctionSelect(@kne/react-function-select),Antd(antd)
+
+```jsx
+const {createFunctionSelect,DisplayFunction}=FunctionSelect;
+const {Button}=Antd;
+
+const {useState}=React;
+
+const BaseExample = ()=>{
+    const [v,setV]=useState([{label:"sdsf",value:"002002013"}]);
+
+    return <Button onClick={()=>{
+        createFunctionSelect({
+            labelInValue:true,
+            defaultValue:v,
+            size:3,
+            selectLevel:3,
+            onChange:(code)=>{
+                setV(code);
+            }
+        })
+    }}>
+      <DisplayFunction id={v.map(item=>item.value)}>{(list)=>{
+            if(Array.isArray(list)){
+                return list.map(item=>item.chName).join(",")
+            }
+            return list&&list.chName
+        }}</DisplayFunction>  
     </Button>
 };
 
@@ -135,3 +172,4 @@ render(<BaseExample />);
 | getChildById(id)     |通过id，获取子级职能集合|function|-|
 | searchfunctions(searchStr) |通过关键字搜索职能，支持拼音首字母缩写|function|-|
 |  labelInValue  | value是否包含label | boolean | false |
+|  selectAll  | 允许选择所有层级level | boolean | false |

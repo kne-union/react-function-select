@@ -8,18 +8,23 @@ export const apis = {
             return cache;
         };
     })(),
-    getAllList: ()=>{
+    searchfunctions: (value) => {
+        if (!value) {
+            return Promise.resolve([]);
+        }
         return apis.loadData().then(({data}) => {
-            return data
+            return data.filter(item=>item.code.length>6).filter((item) => {
+                return ['chName', 'shortName', 'enName'].some((name) => {
+                    return item[name].toUpperCase().indexOf(value.toUpperCase()) > -1;
+                });
+            }).map((item) => {
+                const parentName=data.find(key=>key.code===item.parentCode)?data.find(key=>key.code===item.parentCode).chName:"";
+                return {
+                    label: `${parentName} / ${item.chName}`, 
+                    value: item.code
+                };
+            });
         });
-    },
-    getLeftList: () => {
-        return apis.loadData().then(({data}) => {
-            return data.filter(item=>!item.parentCode)
-        });
-    },
-    getChildById: (data,id) => {
-        return data.filter(item=>item.parentCode===id)
     },
     getFunction: (id) => {
         return apis.loadData().then(({data}) => {
@@ -34,35 +39,34 @@ export const apis = {
             return null
         });
     }, 
-    getFunctionByName:(name)=>{
+    getAllList: ()=>{
         return apis.loadData().then(({data}) => {
-            if(Array.isArray(name)){
-                return data.filter(item=>{
-                    return name.some(i=>item.chName===i)
-                })
-            }
-            if(typeof name === 'string'){
-                return data.find(item=>item.chName===name)
-            }
-            return null
+            return data
         });
     },
-    searchfunctions: (value) => {
-        if (!value) {
-            return Promise.resolve([]);
+    getLeftList: (data) => data.filter(item=>!item.parentCode),
+    getChildById: (data,id) => data.filter(item=>item.parentCode===id),
+    getFunctionById: (data,id) => {
+        if(Array.isArray(id)){
+            return data.filter(item=>{
+                return id.some(i=>item.code===i)
+            })
         }
-        return apis.loadData().then(({data}) => {
-            return data.filter(item=>item.code.length>6).filter((item) => {
-                return ['chName', 'shortName', 'enName'].some((name) => {
-                    return item[name].toUpperCase().indexOf(value.toUpperCase()) > -1;
-                });
-            }).map((item) => {
-                return {
-                    label: item.chName, 
-                    value: item.code
-                };
-            });
-        });
+        if(typeof id === 'string'){
+            return data.find(item=>item.code===id)
+        }
+        return null
+    }, 
+    getFunctionByName:(data,name)=>{
+        if(Array.isArray(name)){
+            return data.filter(item=>{
+                return name.some(i=>item.chName===i)
+            })
+        }
+        if(typeof name === 'string'){
+            return data.find(item=>item.chName===name)
+        }
+        return null
     }
 };
 
