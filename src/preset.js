@@ -8,19 +8,20 @@ export const apis = {
             return cache;
         };
     })(),
-    searchfunctions: (value) => {
+    searchfunctions: (value,level) => {
+
         if (!value) {
             return Promise.resolve([]);
         }
         return apis.loadData().then(({data}) => {
-            return data.filter(item=>item.code.length>6).filter((item) => {
+            return data.filter(item=>level===3?((+item.storey)<=3):(level===2?((+item.storey)>=level):(+item.storey)===3)).filter((item) => {
                 return ['chName', 'shortName', 'enName'].some((name) => {
                     return item[name].toUpperCase().indexOf(value.toUpperCase()) > -1;
                 });
             }).map((item) => {
                 const parentName=data.find(key=>key.code===item.parentCode)?data.find(key=>key.code===item.parentCode).chName:"";
                 return {
-                    label: `${parentName} / ${item.chName}`, 
+                    label:parentName? `${parentName} / ${item.chName}`:item.chName, 
                     value: item.code
                 };
             });
@@ -29,9 +30,7 @@ export const apis = {
     getFunction: (id) => {
         return apis.loadData().then(({data}) => {
             if(Array.isArray(id)){
-                return data.filter(item=>{
-                    return id.some(i=>item.code===i)
-                })
+                return id.map(i=>data.find(item=>item.code===i)||({chName:"-"}))
             }
             if(typeof id === 'string'){
                 return data.find(item=>item.code===id)
@@ -48,9 +47,7 @@ export const apis = {
     getChildById: (data,id) => data.filter(item=>item.parentCode===id),
     getFunctionById: (data,id) => {
         if(Array.isArray(id)){
-            return data.filter(item=>{
-                return id.some(i=>item.code===i)
-            })
+            return id.map(i=>data.find(item=>item.code===i)||({chName:"-"}))
         }
         if(typeof id === 'string'){
             return data.find(item=>item.code===id)

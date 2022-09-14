@@ -1,5 +1,5 @@
-import * as component_93 from '@kne/react-function-select';
-import * as component_94 from 'antd';
+import * as component_7 from '@kne/react-function-select';
+import * as component_8 from 'antd';
 const readmeConfig = {
     name: `@kne/react-function-select`,
     description: `职能选择器`,
@@ -168,7 +168,7 @@ const {Button}=Antd;
 const {useState}=React;
 
 const BaseExample = ()=>{
-    const [v,setV]=useState([{label:"sdsf",value:"002002013"}]);
+    const [v,setV]=useState([{label:"sdsf",value:"002013"}]);
 
     return <Button onClick={()=>{
         createFunctionSelect({
@@ -195,11 +195,11 @@ render(<BaseExample />);
     scope: [{
     name: "FunctionSelect",
     packageName: "@kne/react-function-select",
-    component: component_93
+    component: component_7
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_94
+    component: component_8
 }]
 },{
     title: `职能单选`,
@@ -236,11 +236,11 @@ render(<BaseExample />);
     scope: [{
     name: "FunctionSelect",
     packageName: "@kne/react-function-select",
-    component: component_93
+    component: component_7
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_94
+    component: component_8
 }]
 },{
     title: `职能多选层级`,
@@ -279,11 +279,11 @@ render(<BaseExample />);
     scope: [{
     name: "FunctionSelect",
     packageName: "@kne/react-function-select",
-    component: component_93
+    component: component_7
 },{
     name: "Antd",
     packageName: "antd",
-    component: component_94
+    component: component_8
 }]
 }]
     }

@@ -28,18 +28,18 @@ export const RemoteData = ({ loader, options, onLoad, children }) => {
 	if (error) {
 		return <Result status="error" title="获取数据发生错误" subTitle={error.message} />
 	}
-	if (!data) {
+	if (!data||get(data,'length',0)===0) {
 		return "-"
 	}
 	return children(data)
 };
 
-const SearchInput = ({ onChange, functionsCode }) => {
+const SearchInput = ({ dataSource,onChange, functionsCode ,level}) => {
 	const [value, setValue] = useState(null);
 	const [data, setData] = useState([]);
-	return <Select labelInValue className='function-modal-search' value={value} onChange={(value) => {
-		if (functionsCode.indexOf(get(value, 'value')) > -1) return;
-		onChange && onChange(value);
+	return <Select className='function-modal-search' value={value} onChange={(value) => {
+		if (functionsCode.indexOf(value) > -1) return;
+		onChange && onChange(_apis.getFunctionById(dataSource,value));
 		setValue(null);
 		setData([]);
 	}} showSearch placeholder="输入职能关键词" style={{ width: '250px' }}
@@ -47,7 +47,7 @@ const SearchInput = ({ onChange, functionsCode }) => {
 		showArrow={false}
 		notFoundContent={null}
 		onSearch={(value) => {
-			return apis.searchfunctions(value).then((list) => {
+			return _apis.searchfunctions(value,level).then((list) => {
 				setData(list);
 			});
 		}}
@@ -57,6 +57,9 @@ const SearchInput = ({ onChange, functionsCode }) => {
 export const apis = _apis;
 
 export const DisplayFunction = ({ id, children }) => {
+	if(!Array.isArray(id)){
+		id=[id];
+	}
 	return <RemoteData loader={apis.getFunction} options={id}>{children}</RemoteData>
 };
 
@@ -68,7 +71,7 @@ const FunctionSelect = ({ labelInValue, dataSource, onCancel, title, size, defau
 		if (!Array.isArray(defaultValue)) return [];
 		const _default = labelInValue ? defaultValue.map(item => get(item, "value")) : defaultValue;
 		return _default.map(id => {
-			const _filter = apis.getFunctionById(dataSource, id);
+			const _filter = apis.getFunctionById(dataSource, id)||{};
 
 			if (_filter) {
 				return {
@@ -78,8 +81,10 @@ const FunctionSelect = ({ labelInValue, dataSource, onCancel, title, size, defau
 					storey: _filter.storey
 				}
 			}
+			return defaultValue[index]
 		})
 	})());
+
 	const firstList = useMemo(() => {
 		return apis.getLeftList(dataSource);
 	}, [dataSource]);
@@ -102,30 +107,26 @@ const FunctionSelect = ({ labelInValue, dataSource, onCancel, title, size, defau
 
 	const appendFunc = (item) => {
 		const { chName: label, storey, parentCode, code: value } = item;
-		if (size === 1) {
-			setfunctions([{ label, storey, parentCode, value }]);
-			onChange([{ label, storey, parentCode, value }]);
-			return;
-		}
 
 		let _functions = cloneDeep(functions);
-
+		
+		if (_functions.length >= size) {
+			message.error(`最多选择${size}个`);
+			return;
+		}
 		if (storey === '2') {
 			_functions = _functions.filter(item => item.parentCode !== value);
 		}
 		if (storey === '1') {
 			_functions = _functions.filter(item => item.value.slice(0,3) !== value);
 		}
-		if (_functions.length >= size) {
-			message.error(`最多选择${size}个`);
-			return;
-		}
+
 		_functions.push({ label, storey, parentCode, value });
 
 		setfunctions([..._functions]);
 	};
 
-	const removeFunc = (code) => {
+	const removeFunc = (code={}) => {
 		setfunctions((list) => {
 			let _list = cloneDeep(list);
 			if (code.storey === '2') {
@@ -143,15 +144,29 @@ const FunctionSelect = ({ labelInValue, dataSource, onCancel, title, size, defau
 		return functions.map(item => get(item, 'value', ""));
 	}, [functions]);
 
+	useEffect(()=>{
+		if (get(defaultValue,'length',0)>0) {
+			const _code=labelInValue?get(defaultValue,"[0].value"):defaultValue[0];
+			if(_code){
+				setSelectedKeys(_code.slice(0,3));
+				setSecondSelectedKeys(_code.slice(0,6))
+			}
+		}
+	},[defaultValue,dataSource,labelInValue])
+	
 	return <Modal {...props} width={1000} centered
 		wrapClassName="function-modal" onCancel={onCancel}
 		title={<Row align="middle" justify="space-between">
 			<Col>{title}</Col>
 			<Col pull={1}>
 				<SearchInput
+				dataSource={dataSource}
+					level={selectLevel}
 					functionsCode={functionsCode}
 					onChange={(value) => {
 						appendFunc(value);
+						setSelectedKeys(value.code.slice(0,3));
+						setSecondSelectedKeys(value.code.slice(0,6))
 					}} /></Col>
 			{modalTitleRight && <Col pull={2}>
 				{modalTitleRight}
@@ -162,22 +177,22 @@ const FunctionSelect = ({ labelInValue, dataSource, onCancel, title, size, defau
 					<Space wrap={false} size={8} className='function-modal-selected'>
 						<span style={{
 							whiteSpace: 'nowrap'
-						}}>已选{size > 1 ? <>（{functions.length}/{size}）</> : null}：</span>
+						}}>已选（{functions.length}/{size}）：</span>
 						{functions.map(({ value, label }, index) => {
-							return <Tag key={value} className='industry-modal-tag' closable={size > 1} onClose={() => {
+							return <Tag key={value} className='industry-modal-tag' closable={true} onClose={() => {
 								removeFunc(value);
 							}}>{label}</Tag>;
 						})}
 					</Space>
 				</Row>
-				{size > 1 ? <Row justify='end'>
+				<Row justify='end'>
 					<Space size={8} >
 						<Button onClick={onCancel}>取消</Button>
 						<Button type="primary" onClick={() => {
 							onChange(functions);
 						}}>确认</Button>
 					</Space>
-				</Row> : null}
+				</Row>
 			</Space>}>
 		<Row wrap={false}>
 			<Col className='function-modal-left'>
