@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Modal, Row, Col, Checkbox, Result, Spin, Space, Tag, Menu, Select, Button, message, Badge } from 'antd';
-import { withLayer } from "@kne/antd-enhance";
+import { Modal, Row, Col, Checkbox, Result, Divider, Space, Tag, Menu, Select, Button, message, Badge } from 'antd';
+import withLayer from '@kne/with-layer';
 import { apis as _apis } from './preset';
 import "./index.scss";
 import get from 'lodash/get';
@@ -172,8 +172,8 @@ const FunctionSelect = ({ labelInValue, dataSource, onCancel, title, size, defau
 				{modalTitleRight}
 			</Col>}
 		</Row>} footer={
-			<Space className='function-modal-footer' direction='vertical' size={12}>
-				<Row align='middle' justify='start'>
+			<Space className='function-modal-footer' direction='vertical' size={0}>
+				<Row align='middle' justify='start' className='function-modal-footer-top'>
 					<Space wrap={false} size={8} className='function-modal-selected'>
 						<span style={{
 							whiteSpace: 'nowrap'
@@ -185,7 +185,8 @@ const FunctionSelect = ({ labelInValue, dataSource, onCancel, title, size, defau
 						})}
 					</Space>
 				</Row>
-				<Row justify='end'>
+				<Divider/>
+				<Row justify='end' className='function-modal-footer-bottom'>
 					<Space size={8} >
 						<Button onClick={onCancel}>取消</Button>
 						<Button type="primary" onClick={() => {
@@ -299,13 +300,13 @@ export const createFunctionSelect = withLayer(({ close, onChange, labelInValue, 
 		return <FunctionSelect {...props}
 			labelInValue={labelInValue}
 			dataSource={dataSource} onCancel={close} onChange={(value) => {
-				let changeValue = []
+				let changeValue = [],valueObj=[];
 				if (get(value, 'length', 0) > 0) {
-					changeValue = labelInValue ? value.map(item => ({ label: get(item, "label"), value: get(item, 'value') })) :
-						value.map(item => get(item, "value"))
+					valueObj=value.map(item => ({ label: get(item, "label"), value: get(item, 'value') }));
+					changeValue = labelInValue ? valueObj :value.map(item => get(item, "value"))
 				}
 
-				onChange && onChange(changeValue);
+				onChange && onChange(changeValue,valueObj);
 				close();
 			}} />
 	}}</RemoteData>

@@ -1,6 +1,6 @@
 {
   "name": "@kne/react-function-select",
-  "version": "0.2.5",
+  "version": "0.2.9",
   "description": "职能选择器",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
@@ -68,7 +68,7 @@
     "react-scripts": "^5.0.1"
   },
   "dependencies": {
-    "@kne/antd-enhance": "^0.1.10",
+    "@kne/with-layer": "^0.1.5",
     "classnames": "^2.3.1"
   }
 }
