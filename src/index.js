@@ -154,7 +154,9 @@ const FunctionSelect = ({ labelInValue, dataSource, onCancel, title, size, defau
 		}
 	},[defaultValue,dataSource,labelInValue])
 	
-	return <Modal {...props} width={1000} centered
+	return <Modal {...props} 
+		width={1000} 
+		centered
 		wrapClassName="function-modal" onCancel={onCancel}
 		title={<Row align="middle" justify="space-between">
 			<Col>{title}</Col>
@@ -295,11 +297,16 @@ const FunctionSelect = ({ labelInValue, dataSource, onCancel, title, size, defau
 	</Modal>
 };
 
-export const createFunctionSelect = withLayer(({ close, onChange, labelInValue, ...props }) => {
+export const createFunctionSelect = withLayer(({ close, onChange, labelInValue,onCancel, ...props }) => {
 	return <RemoteData loader={apis.getAllList}>{(dataSource) => {
 		return <FunctionSelect {...props}
 			labelInValue={labelInValue}
-			dataSource={dataSource} onCancel={close} onChange={(value) => {
+			dataSource={dataSource} 
+			onCancel={()=>{
+				close();
+				onCancel();
+			}} 
+			onChange={(value) => {
 				let changeValue = [],valueObj=[];
 				if (get(value, 'length', 0) > 0) {
 					valueObj=value.map(item => ({ label: get(item, "label"), value: get(item, 'value') }));
@@ -308,6 +315,7 @@ export const createFunctionSelect = withLayer(({ close, onChange, labelInValue, 
 
 				onChange && onChange(changeValue,valueObj);
 				close();
+				onCancel();
 			}} />
 	}}</RemoteData>
 });
